@@ -119,8 +119,8 @@ function LoadChat() {
     });
 }
 
-setInterval(()=>{
-    if (PairUserID != null) LoadChat();
+setInterval(async ()=>{
+    if (PairUserID != null) await LoadChat();
 }, 100);
 
 SendButton.onclick = () => {
