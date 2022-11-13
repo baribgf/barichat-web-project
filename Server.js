@@ -1,5 +1,4 @@
 // importing required modules
-const https = require('https');
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
@@ -73,10 +72,4 @@ app.post('/signup', (req, res) => {
     return res.json({ "status": "ALLOWED" })
 })
 
-const options = {
-    key: fs.readFileSync('./https-options/server.key'),
-    cert: fs.readFileSync('./https-options/server.cert')
-};
-https.createServer(options, app).listen(8081, () => {
-    console.log('Server running at https://127.0.0.1:8081/');
-});
+app.listen(8081, ()=>{"Starting in port: 8081"})
