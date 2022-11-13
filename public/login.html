@@ -1,0 +1,124 @@
+<div id="login-container">
+    <h1 id="login-header" style="margin: 0 0 6% 0; align-self: center; font-weight: 400;"><mark style="background-color: lightblue;padding: 1vh 2vw 1.6vh 2vw;">Login</mark></h1>
+    <div id="login-form">
+        <input id="email-entry" type="email" name="email-entry" placeholder="Email">
+        <input id="password-entry" type="password" name="password-entry" placeholder="Password">
+        <button id="submit-btn">Login</button>
+        <div id="signup">Don't have an account? <a href="./index.html?action=signup">signup</a></div>
+    </div>
+</div>
+<style>
+    #login-container {
+        background-color: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        height: 100%;
+        width: 100%;
+    }
+    #login-form {
+        display: grid;
+        grid-template-rows: 25% 25% 20% 20%;
+        height: 50%;
+        row-gap: 2%;
+        padding: 2%;
+    }
+    #email-entry {
+        background-color: #9ccbfa;
+        grid-row: 1;
+        width: 50%;
+        height: 80%;
+        justify-self: center;
+        border: 0;
+        border-radius: 6px;
+        padding: 0% 2%;
+        align-self: center;
+    }
+    #password-entry {
+        background-color: #9ccbfa;
+        grid-row: 2;
+        width: 50%;
+        height: 80%;
+        justify-self: center;
+        border: 0;
+        border-radius: 6px;
+        padding: 0% 2%;
+        align-self: center;
+    }
+    ::placeholder {
+        color: white;
+        opacity: 0.8;
+        font-size: 18px;
+        font-weight: 300;
+    }
+    #submit-btn {
+        /*background-color: lightblue;*/
+        grid-row: 3;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        justify-self: center;
+        align-self: center;
+        border: 0;
+        border-radius: 10px;
+        width: 20%;
+        height: 80%;
+    }
+    #submit-btn:hover {
+        background-color: lightgray;
+    }
+    #signup {
+        grid-row: 4;
+        justify-self: center;
+        align-self: center;
+    }
+    @media screen and (max-width: 800px) {
+        #login-form {
+            display: grid;
+            grid-template-rows: 25% 25% 30% 20%;
+            height: 60%;
+            row-gap: 8%;
+            padding: 2%;
+        }
+        #email-entry {
+            height: 100%;
+        }
+        #password-entry {
+            height: 100%;
+        }
+        #submit-btn {
+            width: 20%;
+            height: 70%;
+        }
+        #signup {
+            padding-bottom: 10%;
+        }
+    }
+
+</style>
+<script type="text/javascript">
+    const SubmitBtn = document.querySelector("#submit-btn");
+
+    SubmitBtn.addEventListener('click', () => {
+        fetch('/login', {
+            method: "POST",
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                "email": `${document.querySelector('#email-entry').value}`,
+                "password": `${document.querySelector('#password-entry').value}`
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === "MATCH") {
+                localStorage.setItem("barichat_userid", data.userid);
+                window.location.href = `./messages.html?userid=${data.userid}`;
+            } else if (data.status === "NO_MATCH") {
+                alert("Invalid Email or Password!");
+            }
+        });
+    });
+</script>
+
+

@@ -1,0 +1,188 @@
+<div id="login-container">
+    <h1 id="login-header" style="margin: 0 0 10% 0; align-self: center; font-weight: 400;"><mark style="background-color: lightblue;padding: 1vh 2vw 1.6vh 2vw;">SignUp</mark></h1>
+    <div id="login-form">
+        <input id="username-entry" type="text" name="username-entry" placeholder="Username">
+        <input id="email-entry" type="email" name="email-entry" placeholder="Email">
+        <input id="password-entry" type="password" name="password-entry" placeholder="Password">
+        <input id="password-confirm-entry" type="password" name="password-confirm-entry" placeholder="Confirm password">
+        <button id="submit-btn">Submit</button>
+        <div id="login">Already have an account? <a href="./index.html">login</a></div>
+    </div>
+</div>
+<style>
+    #login-container {
+        background-color: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        height: 100%;
+        width: 100%;
+    }
+    #login-form {
+        display: grid;
+        grid-template-rows: 20% 20% 20% 20% 16%;
+        height: 60%;
+        row-gap: 2%;
+        padding: 2%;
+    }
+    #username-entry {
+        background-color: #9ccbfa;
+        grid-row: 1;
+        width: 50%;
+        height: 80%;
+        justify-self: center;
+        border: 0;
+        border-radius: 6px;
+        padding: 0% 2%;
+        align-self: center;
+    }
+    #email-entry {
+        background-color: #9ccbfa;
+        grid-row: 2;
+        width: 50%;
+        height: 80%;
+        justify-self: center;
+        border: 0;
+        border-radius: 6px;
+        padding: 0% 2%;
+        align-self: center;
+    }
+    #password-entry {
+        background-color: #9ccbfa;
+        grid-row: 3;
+        width: 50%;
+        height: 80%;
+        justify-self: center;
+        border: 0;
+        border-radius: 6px;
+        padding: 0% 2%;
+        align-self: center;
+    }
+    #password-confirm-entry {
+        background-color: #9ccbfa;
+        grid-row: 4;
+        width: 50%;
+        height: 80%;
+        justify-self: center;
+        border: 0;
+        border-radius: 6px;
+        padding: 0% 2%;
+        align-self: center;
+    }
+    ::placeholder {
+        color: white;
+        opacity: 0.8;
+        font-size: 18px;
+        font-weight: 300;
+    }
+    #submit-btn {
+        /*background-color: lightblue;*/
+        grid-row: 5;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        justify-self: center;
+        align-self: center;
+        border: 0;
+        border-radius: 10px;
+        width: 20%;
+        height: 80%;
+    }
+    #submit-btn:hover {
+        background-color: lightgray;
+    }
+    #login {
+        grid-row: 6;
+        justify-self: center;
+        align-self: center;
+    }
+    @media screen and (max-width: 800px) {
+        body {
+            height: 140vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        #article-header-container {
+            height: 80%;
+        }
+        #login-form {
+            display: grid;
+            grid-template-rows: 20% 20% 20% 20% 25% 10%;
+            height: 55%;
+            row-gap: 8%;
+            padding: 2%;
+        }
+        #username-entry {
+            height: 100%;
+        }
+        #email-entry {
+            height: 100%;
+        }
+        #password-entry {
+            height: 100%;
+        }
+        #password-confirm-entry {
+            height: 100%;
+        }
+        #submit-btn {
+            width: 20%;
+            height: 70%;
+        }
+        #login {
+            padding-bottom: 10%;
+        }
+    }
+
+</style>
+<script type="text/javascript">
+    const UsernameEntry = document.querySelector('#username-entry');
+    const EmailEntry = document.querySelector('#email-entry');
+    const PasswordEntry = document.querySelector('#password-entry');
+    const PasswordConfirmEntry = document.querySelector("#password-confirm-entry");
+    const SubmitBtn = document.getElementById("submit-btn");
+
+    function containsSymbols(str) {
+        const symbols = /[`!@#$%^&*()+\-=\[\]{};':"\\|,.<>\/?~]/;
+        return symbols.test(str);
+    }
+
+    SubmitBtn.addEventListener('click', () => {
+        if (containsSymbols(UsernameEntry.value)) {
+            return alert('Usernames allowed only with [aA-zZ] [0-9] _ charachters !');
+        }
+        if (UsernameEntry.value.length < 3 || UsernameEntry.value.length > 32) {
+            return alert('Username must be [3 - 32] length !');
+        }
+        if (EmailEntry.value < 3) {
+            return alert('Email must be 3 or more length');
+        }
+        if (PasswordEntry.value.length < 8) {
+            return alert('Password must be 8 or more length !');
+        }
+        if (PasswordConfirmEntry.value != PasswordEntry.value) {
+            return alert('Password doesn\'t match !');
+        }
+
+        fetch('/signup', {
+            method: "POST",
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                "username": `${UsernameEntry.value}`,
+                "email": `${EmailEntry.value}`,
+                "password": `${PasswordEntry.value}`
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === "ALLOWED") {
+                window.location.href = "./index.html"
+            } else if (data.status === "NOT_ALLOWED") {
+                alert("Email already exists !");
+            }
+        });
+    });
+</script>
+
+

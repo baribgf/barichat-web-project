@@ -1,0 +1,141 @@
+const UserID = new URL(window.location.href).searchParams.get('userid');
+const SendButton = document.getElementById("send-button");
+const ChatArea = document.getElementById("chat-area");
+const ContactsArea = document.querySelector("#contacts-area")
+const MessageText = document.getElementById("message-area");
+const NEW_CHAT_STRING = "new chat !";
+
+var ChatText = ""
+var PairUserID = null
+
+if (UserID === null || UserID !== localStorage.getItem("barichat_userid")) {
+    window.location.href = "./404.html";
+}
+
+document.getElementById("messaging-section").style.gridTemplateRows = "100% 0%"
+$("#message-area").hide()
+$("#send-button").hide()
+
+class Contact {
+    name = ""
+    ContBox = null
+    constructor(name, id) {
+        this.name = name
+        this.ContBox = document.createElement("li")
+        this.ContBox.setAttribute("class", "contact")
+        this.ContBox.innerHTML = name
+        this.ContBox.onclick = ()=>{
+            if (PairUserID == null) {
+                $("#chat-area").empty()
+                document.getElementById("messaging-section").style.gridTemplateRows = "90% 10%"
+                $("#message-area").show()
+                $("#send-button").show()
+            }
+            PairUserID = id
+        }
+    }
+    get() {
+        return this.ContBox
+    }
+}
+
+function Message(content, user) {
+    let msgBox = document.createElement("div");
+    let msg = document.createElement("msg");
+    // msgBox.style.border = "0.5px solid";
+    msgBox.style.width = "48%";
+    msgBox.style.padding = "1% 2% 1% 2%";
+    msgBox.style.margin = "1%";
+    msgBox.style.borderRadius = "10px";
+    if (user === 1) {
+        msgBox.style.alignSelf = "flex-end";
+        msgBox.style.backgroundColor = "lightgreen";
+    } else {
+        msgBox.style.alignSelf = "flex-start";
+        msgBox.style.backgroundColor = "lightblue";
+    }
+    msg.innerHTML = content.replaceAll('\\n', "<br>");
+    msgBox.appendChild(msg)
+    return msgBox;
+}
+
+fetch('/api', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({"command": "get_users_list"})
+})
+.then(res => res.json())
+.then(data => {
+    for (let username of Object.keys(data)) {
+        if (data[username]["email"] == UserID) continue;
+        let contact = new Contact(username, data[username]["email"])
+        ContactsArea.appendChild(contact.get())
+    }
+});
+
+let targetMessageFile = [];
+function LoadChat() {
+    return new Promise((resolve) => {
+        if (PairUserID == null) return;
+        targetMessageFile[0] = `${UserID}-${PairUserID}`;
+        targetMessageFile[1] = `${PairUserID}-${UserID}`;
+
+        fetch('/api', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({"command": "read_message_data", "path1": targetMessageFile[0], "path2": targetMessageFile[1]})
+        })
+        .then(response => response.text())
+        .then(data => {
+            if (data !== ChatText) {
+                ChatText = data
+                // alert("CHAT UPDATED")
+                $("#chat-area").empty();
+                if (data === "err:ENOENT") {
+                    fetch('/api', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({"command": "write_message_data", "path1": targetMessageFile[0], "text": NEW_CHAT_STRING})
+                    });
+                    ChatArea.appendChild(Message(NEW_CHAT_STRING, 0));
+                    resolve();
+                } else {
+                    for (let line of data.split(/\r?\n/)) {
+                        if (line !== NEW_CHAT_STRING) {
+                            if (line.split(":")[0] === UserID) {
+                                ChatArea.appendChild(Message(line.split(":")[1], 1));
+                            } else {
+                                ChatArea.appendChild(Message(line.split(":")[1], 0));
+                            }
+                        } else {
+                            ChatArea.appendChild(Message(line, 0));
+                        }
+                    }
+                    resolve();
+                }
+                ChatArea.scrollTop = ChatArea.scrollHeight;
+            }
+        });
+    });
+}
+
+setInterval(()=>{
+    if (PairUserID != null) LoadChat();
+}, 100);
+
+SendButton.onclick = () => {
+    let sentMessage = `\n${UserID}:${MessageText.value.replaceAll('\n', "\\n")}`;
+    if (MessageText.value.replaceAll('\n', "") == "") return ()=>{MessageText.value = "";};
+    MessageText.value = "";
+
+    fetch('/api', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({"command": "write_message_data", "path1": targetMessageFile[0], "path2": targetMessageFile[1], "text": `${sentMessage}`})
+    }).then(res => res.json())
+    .then(data => {
+        LoadChat()
+    })
+};
