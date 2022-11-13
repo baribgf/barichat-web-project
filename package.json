@@ -4,5 +4,8 @@
   },
   "devDependencies": {
     "@types/express": "^4.17.14"
+  },
+  "scripts": {
+    "start": "node ./Server.js"
   }
 }
