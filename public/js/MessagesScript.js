@@ -47,11 +47,11 @@ class Message {
     constructor(content, user) {
         this.content = content
         this.user = user
+        this.msgBox.style.width = "48%";
+        this.msgBox.style.padding = "1% 2% 1% 2%";
+        this.msgBox.style.margin = "1%";
+        this.msgBox.style.borderRadius = "10px";
     }
-    msgBox.style.width = "48%";
-    msgBox.style.padding = "1% 2% 1% 2%";
-    msgBox.style.margin = "1%";
-    msgBox.style.borderRadius = "10px";
     if (this.user === 1) {
         msgBox.style.alignSelf = "flex-end";
         msgBox.style.backgroundColor = "lightgreen";
