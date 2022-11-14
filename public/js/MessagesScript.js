@@ -112,6 +112,7 @@ function LoadChat() {
                             if (line.split(":")[0] === UserID) {
                                 ChatArea.appendChild(new Message(line.split(":")[1], 1).get());
                             } else {
+                                console.log(line.split(":")[1])
                                 ChatArea.appendChild(new Message(line.split(":")[1], 0).get());
                             }
                         } else {
