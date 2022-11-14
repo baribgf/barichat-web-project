@@ -129,7 +129,7 @@ function LoadChat() {
 
 setInterval(async ()=>{
     if (PairUserID != null) await LoadChat();
-}, 2000);
+}, 100);
 
 SendButton.onclick = () => {
     let sentMessage = `\n${UserID}:${MessageText.value.replaceAll('\n', "\\n")}`;
