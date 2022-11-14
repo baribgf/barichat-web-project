@@ -39,22 +39,27 @@ class Contact {
     }
 }
 
-function Message(content, user) {
-    let msgBox = document.createElement("div");
-    let msg = document.createElement("msg");
-    // msgBox.style.border = "0.5px solid";
+class Message {
+    msgBox = document.createElement("div");
+    msg = document.createElement("msg");
+    content = ""
+    user = ""
+    constructor(content, user) {
+        this.content = content
+        this.user = user
+    }
     msgBox.style.width = "48%";
     msgBox.style.padding = "1% 2% 1% 2%";
     msgBox.style.margin = "1%";
     msgBox.style.borderRadius = "10px";
-    if (user === 1) {
+    if (this.user === 1) {
         msgBox.style.alignSelf = "flex-end";
         msgBox.style.backgroundColor = "lightgreen";
     } else {
         msgBox.style.alignSelf = "flex-start";
         msgBox.style.backgroundColor = "lightblue";
     }
-    msg.innerHTML = content.replaceAll('\\n', "<br>");
+    msg.innerHTML = this.content.replaceAll('\\n', "<br>");
     msgBox.appendChild(msg)
     return msgBox;
 }
@@ -97,18 +102,18 @@ function LoadChat() {
                         headers: {'Content-Type': 'application/json'},
                         body: JSON.stringify({"command": "write_message_data", "path1": targetMessageFile[0], "text": NEW_CHAT_STRING})
                     });
-                    ChatArea.appendChild(Message(NEW_CHAT_STRING, 0));
+                    ChatArea.appendChild(new Message(NEW_CHAT_STRING, 0));
                     resolve();
                 } else {
                     for (let line of data.split(/\r?\n/)) {
                         if (line !== NEW_CHAT_STRING) {
                             if (line.split(":")[0] === UserID) {
-                                ChatArea.appendChild(Message(line.split(":")[1], 1));
+                                ChatArea.appendChild(new Message(line.split(":")[1], 1));
                             } else {
-                                ChatArea.appendChild(Message(line.split(":")[1], 0));
+                                ChatArea.appendChild(new Message(line.split(":")[1], 0));
                             }
                         } else {
-                            ChatArea.appendChild(Message(line, 0));
+                            ChatArea.appendChild(new Message(line, 0));
                         }
                     }
                     resolve();
