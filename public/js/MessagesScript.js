@@ -108,7 +108,7 @@ function LoadChat() {
                     resolve();
                 } else {
                     for (let line of data.split(/\r?\n/)) {
-                        if (line !== "") continue;
+                        if (line == "") continue;
                         if (line !== NEW_CHAT_STRING) {
                             if (line.split(":")[0] === UserID) {
                                 ChatArea.appendChild(new Message(line.split(":")[1], 1).get());
